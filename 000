@@ -1,0 +1,4 @@
+print("who are you?")
+you=input()
+print("Hello!")
+print(you)
