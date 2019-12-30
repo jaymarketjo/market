@@ -1,0 +1,15 @@
+import requests
+import time
+url='https://cdn.heweather.com/china-city-list.txt'
+strhtml=requests.get(url)
+data=strhtml.text
+datal=data.split("\n")
+for i in range(3):
+    datal.remove(datal[0])
+for item in datal:
+    url = 'https://free-api.heweather.com/v5/forecast?city=' + item[0:11] + '&key=7d0daf2a85f64736a42261161cd3060b'
+    strhtml = requests.get(url)
+    time.sleep(1)
+    dic=strhtml.json()
+    for item in dic["HeWeather5"][0]["daily_forecast"]:
+        print(item["tmp"]["max"])
