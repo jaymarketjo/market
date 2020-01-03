@@ -1,0 +1,8 @@
+Python脚本转exe可执行文件
+安装pyinstaller
+首先打开控制台（CMD），
+输入“pip install pyinstaller”,
+使用pyinstaller：
+第一步：输入文件所在盘“D：”即可换到该盘下，（大小写均可）
+第二步：输入“cd D:\python_output”换到文件目录，
+第三步：输入“pyinstaller –F areaair.py”，回车即可。
