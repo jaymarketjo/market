@@ -1,0 +1,100 @@
+#360doc采集
+# -*- coding: utf-8 -*-
+#20191211 by 微信：huguo00289
+
+import requests
+from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
+import time
+import pdfkit
+import os
+import re
+
+class Doc(object):
+    def __init__(self,url):
+        self.ua=UserAgent()
+        self.url =url
+        self.headers={"User-Agent":self.ua.random,'Referer': self.url}
+        self.confg = pdfkit.configuration(wkhtmltopdf=r'C:\Users\Administrator\AppData\Local\Programs\Python\Python37\wkhtmltox\bin\wkhtmltopdf.exe') #wkhtmltopdf路径需改为你自己的！
+        self.path=r'360doc' #文件路径
+        self.h2=''
+
+
+    #访问文库链接
+    def get_soup(self):
+        response=requests.get(self.url,headers=self.headers)
+        if response.status_code==200:
+            soup=BeautifulSoup(response.content.decode('utf-8'),'lxml')
+        else:
+            print("访问%s文档链接失败！"%self.url)
+            soup=None
+        return soup
+
+    #获取文章内容
+    def get_content(self,soup):
+        texts=''
+        #获取标题
+        h2=soup.find('h2').get_text()
+        h2 = h2.replace('\n', '')
+        h2 = re.sub(r'[\|\/\<\>\:\*\?\\\"]', "_", h2)  # 剔除不合法字符
+        self.h2=h2
+        print(h2)
+        path='%s/%s/'%(self.path,self.h2)
+        os.makedirs(path, exist_ok=True)
+        #获取文本内容
+        atricle = soup.find('table')
+        p_texts=atricle.find_all('p')
+        i=1
+        for p_text in p_texts:
+            if "img" in str(p_text):
+                img_url=p_text.find('img')['src']
+                img_name=f'{i}.jpg'
+                r=requests.get(img_url,headers=self.headers)
+                with open('%s/%s/%s' % (self.path, h2, img_name), 'wb') as f:
+                    f.write(r.content)
+                    print(f">>> 下载{img_name}图片成功了！")
+                time.sleep(1)
+                i=i+1
+                p_text=img_name
+            else:
+                p_text=p_text.get_text()
+            texts = '%s%s%s'%(texts,'\n',p_text)
+        texts = '%s%s%s' % (h2, '\n', texts)
+        print(texts)
+        print(f"开始保存{h2}.txt文档...")
+        with open('%s/%s/%s.txt' % (self.path,h2,h2),'w',encoding='utf-8') as f:
+            f.write(texts)
+            print(f">>> 保存{h2}文档成功了！")
+
+        #获取图片
+        imgs=atricle.find_all('img')
+        y = 1
+        for img in imgs:
+            imgq_url=img['src']
+            imgq_name=f'q_{y}.jpg'
+            rq = requests.get(imgq_url, headers=self.headers)
+            with open('%s/%s/%s' % (self.path, h2, imgq_name), 'wb') as f:
+                f.write(rq.content)
+                print(f">>> 下载{imgq_name}图片成功了！")
+            y=y+1
+            time.sleep(2)
+
+
+        self.dypdf(atricle, h2) #保存为pdf
+
+
+    #保存为pdf
+    def dypdf(self,atricle,h2):
+        path='%s/%s/%s.pdf' % (self.path,h2,h2)
+        datas=f'<html><head><meta charset="UTF-8"></head><body>{atricle}</body></html>'
+        print("开始打印内容！")
+        pdfkit.from_string(datas, path, configuration=self.confg)
+        print("打印保存成功！")
+
+
+if __name__=='__main__':
+    url='http://www.360doc.com/content/19/1205/17/61082271_877658220.shtml'
+    spider=Doc(url) #实例化
+    soup=spider.get_soup()
+    spider.get_content(soup)
+
