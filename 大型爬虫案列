@@ -45,3 +45,4 @@ for dep_item in dep_dict['data']:
                 if query['query'] not in a:
                     a.append(query['query'])
                     print(a)
+获取产品列表
