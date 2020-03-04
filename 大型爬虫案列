@@ -72,3 +72,18 @@ for dep__item in dep__dict['data']:
                       a.append(query['query'])
       for item in a:
           url = 'https://touch.dujia.qunar.com/list?modules=list,bookingInfo&dep={} &query={} &mtype=all&ddt=false&mobFunction=%E6%89%A9%E5%B1%95%E8%87%AA%E7%94%Bl%E8%Al%8C&cfrom=zyx&it=FreetripTouchin&et=FreetripTouch&date=&configDepNew=&needNoResult=true&originalquery={}&limit=0,20 &includaAD=true&qsact=search'.format(urllib.request.quote(dep),urllib.request.quote(item),urllib.request.quote(item))
+      time.sleep (1)
+      strhtml=requests.get(url)
+      routeCount=int(strhtml.json() ['data'] ['limit'] ['routeCount'])
+      for limit in range(0, routeCount, 20):
+          url = 'https://touch.dujia.qunar.com/list?modules=list,bookingInfo&dep={} &query={} &mtype=all&ddt=false&mobFunction=%E6%89%A9%E5%B1%95%E8%87%AA%E7%94%Bl%E8%Al%8C&cfrom=zyx&it=FreetripTouchin&et=FreetripTouch&date=&configDepNew=&needNoResult=true&originalquery={}&limit=0,20 &includaAD=true&qsact=search'.format(urllib.request.quote(dep),urllib.request.quote(item),urllib.request.quote(item))
+          time.sleep(1)
+          strhtml = requests.get(url)
+          result = {
+            'date': time.strftime('%Y-%m-%d',time.localtime(time.time())),
+            'dep': dep,
+            'arrive': item,
+            'limit': limit,
+            'result': strhtml.json()
+          }
+          sheet_qunar_zyx.insert_one(result)
