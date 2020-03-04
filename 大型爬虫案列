@@ -1,1 +1,7 @@
-
+import requests
+url='https://touch.dujia.qunar.com/depCities.qunar'
+strhtml=requests.get(url)
+dep_dict=strhtml.json()
+for dep_item in dep_dict['data']:
+  for dep in dep_dict['data'][dep_item]:
+    print(dep)
