@@ -46,3 +46,29 @@ for dep_item in dep_dict['data']:
                     a.append(query['query'])
                     print(a)
 获取产品列表
+import requests
+import urllib
+import time
+import pymongo
+
+client=pymongo.MongoClient('localhost',27017)
+book_qunar=client['qunar']
+sheet_qunar_zyx=book_qunar['qunar_zyx']
+url='https://touch.dujia.qunar.com/depCities.qunar'
+strhtml=requests.get(url)
+dep_dict=strhtml.json()
+for dep__item in dep__dict['data']:
+  for dep in dep_dict['data'][dep_item]:
+      a = []
+      url = 'https://m.dujia.qunar.com/golfz/sight/arriveRecommend?dep={}&exclude=&extensionImg=255,175'.format(
+          urllib.request.quote(dep))
+      time.sleep(1)
+      strhtml = requests.get(url)
+      arrive_dict = strhtml.json()
+      for arr_item in arrive_dict['data']:
+          for arr_item_l in arr_item['subModules']:
+              for query in arr_item_l['items']:
+                  if query['query'] not in a:
+                      a.append(query['query'])
+      for item in a:
+          url = 'https://touch.dujia.qunar.com/list?modules=list,bookingInfo&dep={} &query={} &mtype=all&ddt=false&mobFunction=%E6%89%A9%E5%B1%95%E8%87%AA%E7%94%Bl%E8%Al%8C&cfrom=zyx&it=FreetripTouchin&et=FreetripTouch&date=&configDepNew=&needNoResult=true&originalquery={}&limit=0,20 &includaAD=true&qsact=search'.format(urllib.request.quote(dep),urllib.request.quote(item),urllib.request.quote(item))
