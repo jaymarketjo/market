@@ -1,7 +1,47 @@
-import requests #构建类目树 获取出发地站点
+#构建类目树 获取出发地站点
+import requests 
 url='https://touch.dujia.qunar.com/depCities.qunar'
 strhtml=requests.get(url)
 dep_dict=strhtml.json()
 for dep_item in dep_dict['data']:
   for dep in dep_dict['data'][dep_item]:
     print(dep)
+#获取目的地
+import requests
+import urllib
+import time
+url='https://touch.dujia.qunar.com/depCities.qunar'
+strhtml=requests.get(url)
+dep_dict=strhtml.json()
+for dep_item in dep_dict['data']:
+ for dep in dep_dict['data'] [dep_item]:
+    print(dep)
+    url = 'https://m.dujia.qunar.com/golfz/sight/arriveRecommend?dep={}&exclude=&extensionImg=255,175'.format(urllib.request.quote(dep))
+    time.sleep(1)
+    strhtml = requests.get (url)
+    arrive_dict = strhtml.json()
+    for arr_item in arrive_dict['data']:
+        for arr_item_l in arr_item['subModules']:
+            for query in arr_item_l['items']:
+                print(query['query'])
+#去除重复项              
+import requests
+import urllib
+import time
+url='https://touch.dujia.qunar.com/depCities.qunar'
+strhtml=requests.get(url)
+dep_dict=strhtml.json()
+for dep_item in dep_dict['data']:
+ for dep in dep_dict['data'] [dep_item]:
+    a = []
+    print(dep)
+    url = 'https://m.dujia.qunar.com/golfz/sight/arriveRecommend?dep={}&exclude=&extensionImg=255,175'.format(urllib.request.quote(dep))
+    time.sleep(1)
+    strhtml = requests.get (url)
+    arrive_dict = strhtml.json()
+    for arr_item in arrive_dict['data']:
+        for arr_item_l in arr_item['subModules']:
+            for query in arr_item_l['items']:
+                if query['query'] not in a:
+                    a.append(query['query'])
+                    print(a)
