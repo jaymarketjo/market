@@ -1,4 +1,4 @@
-import requests
+import requests #构建类目树 获取出发地站点
 url='https://touch.dujia.qunar.com/depCities.qunar'
 strhtml=requests.get(url)
 dep_dict=strhtml.json()
