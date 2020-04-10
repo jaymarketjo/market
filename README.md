@@ -1,2 +1,3 @@
 PyCharm
 需要安装requests库、bs4库、lxml库
+Python绘制桑基图 需要安装pyecharts库
