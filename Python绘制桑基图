@@ -55,4 +55,48 @@ pic=(
      )
      .set_global_opts(title_opts=opts.TitleOpts(title='熬夜原因桑基图'))
     )
-    pic.render('test.html')
+    pic.render('test2.html')
+
+#三层流转
+df=pd.read_excel('sankey.xlsx')#导入（狗粮）数据
+df.head(10)
+#
+nodes=[]
+for i in range(3):
+ values=df.iloc[:,i].unique()
+ for value in values:
+ dic={}
+ dic['name']=value
+ nodes.append(dic)
+nodes
+#
+first=df.groupby(['品类','第一次购买'])['人数'].sun().reset_index()
+second=df.iloc[:,1:]
+first.colums=['source','target','value']
+second.colums=['source','target','value']
+result=pd.concat([first,second])
+result.head(10)
+#
+linkes=[]
+for i in df.values:
+ dic={}
+ dic['source']=i[0]
+ dic['target']=i[1]
+ dic['value']=i[2]
+ linkes.append(dic)
+linkes
+#
+from pyecharts.charts import Sankey
+from pyecharts import options as opts
+pic=(
+ Sankey()
+ .add('',
+      nodes,
+      linkes,
+      linestyle_opt=opts.LineStyleOpts(opacity=0.3,curve=0.5,color='source'),
+      label_opts=opts.LabelOpts(position="top"),
+      node_gap=30,
+     )
+     .set_global_opts(title_opts=opts.TitleOpts(title='客户购买路径流转图'))
+    )
+    pic.render('test3.html')
