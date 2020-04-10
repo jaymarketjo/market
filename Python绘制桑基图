@@ -1,1 +1,58 @@
-
+df=pd.DataFrame({
+'性别':['男','男','男','女','女','女'],
+'熬夜原因':['打游戏','加班','看剧','打游戏','加班','看剧'],
+'人数':[57，13,30,33,5,62]
+})
+df
+#
+nodes=[]
+for i in range(2):
+ values=df.iloc[:,i].unique()
+ for value in values:
+  dic={}
+  dic=['name']=value
+  nodes.append(dic)
+nodes
+#
+linkes=[]
+for i in df.values:
+ dic={}
+ dic['source']=i[0]
+ dic['target']=i[1]
+ dic['value']=i[2]
+ linkes.append(dic)
+linkes
+#
+from pyecharts.charts import Sankey
+from pyecharts import options as opts
+pic=(
+ Sankey()
+ .add('',#图例名称
+      nodes,#传入节点数据
+      linkes,#传入边和流量数据
+      #设置透明度、弯曲度、颜色
+      linestyle_opt=opts.LineStyleOpts(opacity=0.3,curve=0.5,color='source'),
+      #标签显示位置
+      label_opts=opts.LabelOpts(position="right"),
+      #节点之前的距离
+      node_gap=30,
+     )
+     .set_global_opts(title_opts=opts.TitleOpts(title='熬夜原因桑基图'))
+    )
+    pic.render('test.html')
+ #垂直显示
+from pyecharts.charts import Sankey
+from pyecharts import options as opts
+pic=(
+ Sankey()
+ .add('',
+      nodes,
+      linkes,
+      linestyle_opt=opts.LineStyleOpts(opacity=0.3,curve=0.5,color='source'),
+      label_opts=opts.LabelOpts(position="top"),
+      node_gap=30,
+      orient="vertical",#更改的是这里
+     )
+     .set_global_opts(title_opts=opts.TitleOpts(title='熬夜原因桑基图'))
+    )
+    pic.render('test.html')
