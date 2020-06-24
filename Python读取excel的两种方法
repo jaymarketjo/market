@@ -1,0 +1,70 @@
+excel是什么
+Microsoft Excel是一个使用非常广泛的电子表格程序。它的用户友好性和吸引人的功能使其成为数据科学中常用的工具。对于excel来说，整个excel文件称为工作簿，工作簿中的每个页称为工作表，工作表又由单元格组成。这是区别于csv格式的一个重要的特征，也就意味着excel文档的处理需要考虑工作表、行、列，才能准确实现数据操作。
+读取excel文件的方法主要有两种，一个方法是使用专门的excel读写包，另一个方法是使用pandas。
+方法1
+1. xlrd、xlwt
+（1）读取excel数据
+import xlrd                                            #导入相应的库
+data = xlrd.open_workbook(r'C:\Users\Desktop\285城市人均GDP.xlsx') # 打开xls文件
+table = data.sheets()[0]                               # 打开第一张表
+nrows = table.nrows                                    # 获取表的行数
+for i in range(nrows):                                 # 循环逐行打印
+    if i == 0:                                         # 跳过第一行
+        continue                                       # 跳到前面再执行循环
+    print(table.row_values(i))     
+ （2）写入excel数据,只支持2003xls的写入
+import xlwt
+workbook = xlwt.Workbook()    
+sheet = workbook.add_sheet('sheet1',cell_overwrite_ok=True)
+
+sheet.write(0,0,'武汉市')
+sheet.write(0,1,'10579.5')
+sheet.write(0,2,'第一')
+sheet.write(1,0,'襄阳市')
+
+workbook.save(r'C:\Users\Desktop\湖北城市GDP.xls')
+print('创建excel文件完成')
+2. openpyxl
+openpyxl模块可实现对excel文件的读、写和修改，只能处理xlsx文件，不能处理xls文件，使用之前同样需要先安装该模块，再导入 import openpyxl。
+对于openpyxl，行数和列数都从1开始，单元格的行和列也从1开始。例如sheet.cell(1,2).value表示第一行第二列单元格的内容
+（1）读取excel数据
+import openpyxl
+ 
+wb = openpyxl.load_workbook(r'C:\Users\Desktop\285城市人均GDP.xlsx') # 打开excel文件,获取工作簿对象
+ws = wb.active  # 从表单中获取单元格的内容
+ 
+print(ws.cell(row=1, column=2))         # 获取第一行第二列的单元格
+print(ws.cell(row=1, column=2).value)
+for i in range(1, 8, 2):                #  获取1,3,4,7 行第二列的值
+    print(i, ws.cell(row=i, column=2).value)
+    
+colC = ws['C']   # 获取整个C列
+print(colC)
+row6 = ws[6]     # 获取第6行
+print(row6,type(row6))
+
+for cell in colC:    # 打印colC单元格中的值内容
+    print(cell.value)
+（2）写入excel数据    
+book = openpyxl.Workbook()  #创建工作簿，如果写入中文为乱码，可添加参数encoding = 'utf-8'
+sheet = book.create_sheet('sheet1',0)  #0表示创建的工作表在工作薄最前面
+
+sheet.cell(row=2,column=5).value=99  #向单元格写入内容：
+sheet1.cell(row=3,column=5,value=100)
+
+book.save(r'C:\Users\Desktop\湖北城市GDP.xlsx')  #保存工作簿，默认保存在py文件相同路径下，如果该路径下有相同文件，会被新创建的文件覆盖
+print('创建excel文件完成')    
+方法2
+1. pands读取excel数据
+import pandas as pd
+path = r'C:\Users\Desktop\湖北城市GDP.xlsx'
+pd.read_excel(path)
+2. pands写入excel数据
+lst =[['武汉','13410.34亿元','1'],['襄阳','4064.90亿元','2'],['宜昌','3857.17亿元','3']]
+dt = pd.DataFrame(lst)
+dt.to_excel(path)
+print('创建excel文件完成')
+    
+    
+    
+    
