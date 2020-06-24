@@ -1,0 +1,184 @@
+1. Matplotlib基础：https://www.runoob.com/numpy/numpy-matplotlib.html
+2. Matplotlib官网：https://matplotlib.org/
+3. Matplotlib中文：https://www.matplotlib.org.cn/
+Matplotlib简介
+Matplotlib 是 Python 的绘图库。它可与 NumPy 一起使用，提供了一种有效的 MatLab 开源替代方案。它也可以和图形工具包一起使用，如 PyQt 和 wxPython。
+
+大量的第三方软件包 扩展并建立在Matplotlib功能的基础上，包括几个更高级别的绘图界面（seaborn， holoviews， ggplot，...）以及两个投影和制图工具包（basemap和cartopy）
+
+Matplotlib绘图基础[1]
+
+基本原理
+
+在绘图结构中，figure创建窗口，subplot创建子图。所有的绘画只能在子图上进行。plt表示当前子图，若没有就创建一个子图。所有你会看到一些教程中使用plt进行设置，一些教程使用子图属性进行设置。他们往往存在对应功能函数。
+
+Figure：面板(图)，matplotlib中的所有图像都是位于figure对象中，一个图像只能有一个figure对象。
+Subplot：子图，figure对象下创建一个或多个subplot对象(即axes)用于绘制图像。
+
+配置参数
+
+参数	解释
+axex	设置坐标轴边界和表面的颜色、坐标刻度值大小和网格的显示
+figure	控制dpi、边界颜色、图形大小、和子区( subplot)设置
+font	字体集（font family）、字体大小和样式设置
+grid	设置网格颜色和线性
+legend	设置图例和其中的文本的显示
+line	设置线条（颜色、线型、宽度等）和标记
+patch	是填充2D空间的图形对象，如多边形和圆。控制线宽、颜色和抗锯齿设置等。
+savefig	可以对保存的图形进行单独设置。例如，设置渲染的文件的背景为白色。
+verbose	设置matplotlib在执行期间信息输出，如silent、helpful、debug和debug-annoying。
+xticks和yticks	为x,y轴的主刻度和次刻度设置颜色、大小、方向，以及标签大小。
+
+要进行相关配置，还需要查阅用户手册或参考网络文献。
+
+Matplotlib创建基本图形
+
+1. 折线图
+
+matplotlib 函数: plot(x, y)[2]
+
+•x: 线或标记的x坐标。
+•y: 线或标记的y坐标。
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = [1,2,3,4,5,6]  
+y1 = [i * 2 for i in x]  # [2,4,6,8,10,12]
+y2 = [m * m for m in x]  # [1,4,9,16,25,36]
+plt.figure(figsize=(5,5))#画板大小
+plt.plot(x, y1)
+plt.plot(x, y2)
+plt.show()
+
+2. 柱状图（竖向）
+
+matplotlib 函数: bar(left, height)[3]
+
+•left: 左侧的x坐标。
+•height: 柱状图的高度。
+
+dt = np.arange(1, 5) 
+values = [2, 5, 9,5]
+plt.figure(figsize=(6,5))
+plt.bar(dt, values)
+plt.show()
+
+叠加图
+
+dt = np.arange(1, 5)
+values = [2, 5, 9,5]
+values1 = [3, 5, 7,20]
+plt.figure(figsize=(6,5))
+plt.bar(dt, values)
+plt.bar(dt, values1 ,bottom = values)
+#plt.bar(dt, values1)
+plt.show()
+
+3. 柱状图（横向）
+
+matplotlib 函数: barh(bottom, width)[4]
+
+•bottom:柱图y坐标
+•width: 柱图的宽度.
+matplotlib中文乱码问题，可以通过以下方式简单解决[5]
+
+plt.rcParams['font.sans-serif']=['SimHei'] #用来正常显示中文标签
+plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
+
+categories = ['1', '2', '3', '4', '5']
+values
+= [7, 12, 4, 2, 9]
+plt.figure(figsize=(6,6))
+plt.barh(np.arange(len(categories)), values)
+plt.yticks(np.arange(len(categories)),
+           ['城市 %s' % x for x in categories])
+plt.show()
+
+4. 直立方
+
+matplotlib 函数: hist(x)[6]
+
+•x: 要显示的分布的值列表。
+column_data = np.random.normal(33, 3, 1000)  # 创建1000个正态(高斯)分布随机数。平均值为42，标准偏差为3。
+plt.figure(figsize=(6,6))
+plt.hist(column_data)
+plt.show()
+
+5. 饼图
+
+matplotlib 函数: pie(sizes)[7]
+
+•sizes: 楔子的大小，如分数或数字。
+counts = [20,30,45, 5]
+plt.figure(figsize=(6, 6))
+plt.pie(counts)
+plt.show()
+
+设置参数
+
+plt.pie(counts,                        
+#         colors=['blue', 'orange','red','green'],
+        labels=['City A', 'City B','City C','City D'],
+        startangle=90,
+        autopct='%.2f%%')
+
+# plt.legend()
+plt.show()
+
+6. 散点图
+
+matplotlib 函数: scatter(x, y)[8]
+
+•x, y: 这两个变量的值。
+
+x = range(100)
+y = np.arange(50, 70,0.2) + (np.random.random(100) * 10.)
+print(x)
+print(y)
+
+plt.figure()
+plt.scatter(x, y)
+plt.show()
+
+设置参数
+
+city1 = ['武汉','襄阳','宜昌','荆州']
+gdp = [14847.29,4309.79,4064.18,2082.18]
+
+colors = ['r','b','k','y']
+
+plt.scatter(range(1,5), gdp, s=gdp, c=colors,alpha=0.5)
+plt.xticks(range(1,5), city1)
+plt.grid(True)
+plt.show()
+
+References
+
+[1] Matplotlib绘图基础: https://www.jianshu.com/p/da385a35f68d
+[2] plot(x, y): http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.plot
+[3] bar(left, height): http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.bar
+[4] barh(bottom, width): http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.barh
+[5] matplotlib中文乱码问题，可以通过以下方式简单解决: https://www.zhihu.com/question/25404709
+[6] hist(x): http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.hist
+[7] pie(sizes): http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.pie
+[8] scatter(x, y): http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.scatter
+
+[9]Matplotlib创建基本图形: https://mooc.study.163.com/smartSpec/detail/1001454002.htm?share=1&shareId=1647514
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
