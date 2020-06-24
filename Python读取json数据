@@ -1,0 +1,39 @@
+什么是json
+1. 概述
+JSON(JavaScript Object Notation, JS 对象简谱) 是一种轻量级的数据交换格式。它基于 ECMAScript (欧洲计算机协会制定的js规范)的一个子集，采用完全独立于编程语言的文本格式来存储和表示数据。简洁和清晰的层次结构使得 JSON 成为理想的数据交换语言。易于人阅读和编写，同时也易于机器解析和生成，并有效地提升网络传输效率。
+JSON 建构于下面的两种结构：
+（1）名值对的集合（A collection of name/value pairs），有时候又叫键值对（key/value）；
+（2）值的有序列表（An ordered list of values），在大部分语言中，它被理解为数组（array）。
+2. 语法规则
+JSON 具有以下形式：
+（1）对象（object）是一个无序的“名值对”集合。一个对象以“{”开始、以“}”结束。每个名称后跟一个“:”。“名值对”之间使用“,”分隔。示例如下：
+json = '{"a": "Hello", "b": "World"}';
+（2）数组（array）是值（value）的有序集合。一个数组以“[”开始，以“]”结束，值之间使用“,”分隔。示例如下：
+js="""{
+    "people":[
+        {
+        "firstName": "zhang",
+        "lastName": "san"
+        },
+        {
+        "firstName": "li",
+        "lastName": "si"
+        }
+    ]
+}"""
+载入json数据
+import json
+ab = json.loads(js)
+ab
+type(ab)
+解析json数据
+import pandas as pdfor name in ct['people']:#解析people名下，lastName名所对应的值    
+print(name["lastName"])
+读取json数据
+import pandas as pdjs =  [{"country":"China","names":["zhang san","li si"]},       
+                          {"country":"England","names":{"name":["mike","bob"]}},       
+                          {"country":"America","names":{"name":["sawyer"]}}]
+dt = pd.DataFrame(js）#讲json数据解析为DataFrame数据
+dt
+存储json数据
+import pandas as pddt = pd.read_excel(r'C:\Users\Desktop\A02-包括各位导师调查数据.xlsx')dt.to_json(r'C:\Users\Desktop\A02-包括各位导师调查数据.json')pd.read_json(r'C:\Users\Desktop\A02-包括各位导师调查数据.json')
