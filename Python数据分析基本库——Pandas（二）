@@ -1,0 +1,94 @@
+元素的选择
+pandas的数据格式最常用的为Series和DataFrame两种类型。那么这两种数据分别应该怎么进行索引和选择呢？pandas中Index对象保存着索引标签数据，它可以快速找到标签对应的整数下标，其功能与Python的字典类似。
+
+1. Series格式
+
+Series格式是一维数据，加上索引可以看为两列，一列索引，一列为值，按照是否自定义索引类型，分为两种情况进行讨论：
+
+（1）默认索引类型
+
+由系统自动添加从0开始按序增加的索引
+
+import pandas as pd
+df=pd.Series(['武汉', '襄阳', '宜昌'])
+df.head()
+#head用于快速预览 Series 与 DataFrame，默认显示 5 条数据，也可以指定显示数据的数量。
+
+#选取索引为0的数据
+data1=df[0]
+print(data1)
+
+#选取索引为0到1的数据，也就是第一个数据和第二个数据
+data2=df[0:1]
+print(data2)
+
+（2）自定义索引类型
+
+import pandas as pd
+df=pd.Series(['武汉', '襄阳', '宜昌'],index=['a', 'b', 'c'])
+
+#选取索引为b的数据
+data3=df["b"]
+print(data3)
+
+2. DataFrame格式
+
+DataFrame格式比Series多一维度，因此索引分为行索引和列索引。其索引方式与Series相似，也分为默认索引和自定义索引两种。
+
+（1）默认索引类型
+
+import pandas as pd
+city_gdp2018 = {'city': ['武汉', '襄阳', '宜昌'],
+        'gdp': [10579.5, 2998.2, 2931.56]}
+
+df=pd.DataFrame(city_gdp2018)
+df.head()
+
+#列索引
+data4=df['city']
+print(data4)
+
+#行索引，用loc指令
+data5=df.loc[1]
+print(data5)
+
+（2）自定义索引类型
+
+import pandas as pd
+city_gdp2018 = {'city': ['武汉', '襄阳', '宜昌'],
+        'gdp': [10579.5, 2998.2, 2931.56]}
+df=pd.DataFrame(city_gdp2018, index=['a','b','c'])   
+
+#列索引
+data6=df['city']
+print(data6)
+
+#行索引
+data7=df.loc['a':'c']
+print(data7)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
