@@ -1,0 +1,176 @@
+LDA主题建模中主题数的确定——基于困惑度与一致性
+
+前言
+1. 首先是导入包
+2. 分词
+3. 复杂性和一致性
+4. 绘制Perplexity-Coherence-Topic 折线图
+5. 依据困惑度和一致性评价结果进行主题建模
+
+
+前言
+
+最近在《比较》公众号上读到《叙事的经济学与经济学叙事》一文，这篇文章介绍到2013年诺贝尔经济学奖得主，耶鲁大学经济学罗伯特·希勒在2017年发表了一篇论文（Narrative Economics），后又写作《叙事经济学》一书，其中有一个重要的观点就是，这里的叙事（Narrative）特指在公众中可以像病毒一样传播的故事，通过滚雪球和病毒式传播，一个叙事可能成为社会经济活动中的重要驱动力量。
+
+然后我就找来这本书阅读，看了一部分后确有茅塞顿开质感，时空语义分析或文本地理挖掘具有很大的现实意义。可以在定性和定量两个方向探索有意思的问题。恰巧我本科读了新闻传播，对媒介行为和叙事有很多基础，如此想来似乎多了一份关注地理空间叙事的动力。
+
+紧接着上次LDA主题建模的分享，这里进一步分析主题数的确定。在LDA主题建模以后，需要对模型的好坏进行评估，以此判断改进的参数或算法的好坏，以及支撑研究问题，比如话题的时空格局特征。
+
+在LDA主题模型中，模型的整体性能需要不断测试并评价，从而优化算法的建模能力。常见的评估方法包括两种：（1）先将测试数据集进行标注分类作为真实结果，然后采用 NMI等算法与聚类结果进行比较。（2）不需要对测试数据集进行分类标注，直接采用训练出来的模型来预测结果。而最常用的评价方法是计算困惑度和相似度。
+
+困惑度指的是在文本分析中，训练出来的模型识别某些文档包含哪些主题具有不确定性。因此数值越低，不确定性就越小，则最后的聚类结果就越好。Blei先生在论文《Latent Dirichlet Allocation》实验中用的是Perplexity值作为评判标准。
+
+主题一致性是另一种主要的最优主题数目选择的模型。国内极少研究采用这种方法确定主题数目，而主题一致性是衡量主题质量最有效的方法，也是估计主题数目的重要技术之一。主题一致性提供四个一致性度量：u_mass、c_v、c_uci 以及c_npmi。想要具体了解的朋友可以去查阅Roeder2015年的文章。在gesim中可以很简单的实现这两个模型。
+
+1. 首先是导入包
+
+import pandas as pd
+import gensim
+import jieba
+import re
+import gensim.corpora as corpora
+from gensim.models import CoherenceModel
+from gensim import corpora, models
+from gensim.models import doc2vec, ldamodel
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+
+2. 分词
+
+#加载停用词
+stopwords = [i.strip() for i in open('datasets/stopwords_hit.txt',encoding='utf-8').readlines()]
+
+#加载数据
+df = pd.read_csv(r"./data.csv")
+df.head(1)
+
+#微博文本数字统一替换为0，多余空格去除。
+
+def cleantext(x):
+    try:
+      result = re.sub(r'\s+', '',x)# remove double space
+      result = re.sub(r'\d+','0',result) #normalize number to zero
+    except:return "None"
+    return result
+df["微博正文"]=df["微博正文"].apply(cleantext)
+
+#分词与去除停用词
+
+def fenci(lines):
+    newslines=[]
+    for line in re.split("。|！|？|；", lines):
+       seg_list = jieba.cut(line+"。", cut_all=False)
+       newslines.extend([i for i in seg_list if len(i)>1 and i not in stopwords])
+    return newslines
+df['fenci']=df.apply(lambda x: fenci(x['微博正文']), axis=1)
+df['fenci']=df.apply(lambda x: " ".join(x['fenci']), axis=1)
+
+3. 复杂性和一致性
+
+'''
+模型复杂度和主题一致性提供了一种方便的方法来判断给定主题模型的好坏程度。
+特别是主题一致性得分更有帮助。
+'''
+model_list = []
+perplexity = []
+coherence_values = []
+
+for num_topics in range(2,21,1):
+    lda_model = models.LdaModel(corpus=corpus,
+                    id2word=dictionary,
+                    random_state=1,
+                    num_topics=num_topics,
+                    # random_state=100,
+                    # update_every=1,
+                    # chunksize=100,
+                    # passes=10,
+                    # alpha='auto',
+                    # per_word_topics=True
+                               )
+    
+    model_list.append(lda_model)
+    
+    #计算困惑度
+    perplexity_values = lda_model.log_perplexity(corpus)
+    print('%d 个主题的Perplexity为: ' % (num_topics-1), perplexity_values) # a measure of how good the model is. lower the better.
+    perplexity.append(perplexity_values)
+    
+    #计算一致性
+    coherencemodel = CoherenceModel(model=lda_model, texts=texts, dictionary=dictionary, coherence='c_v')
+    coherence_values.append(round(coherencemodel.get_coherence(),3))
+    print('%d 个主题的Coherence为: ' % (num_topics-1), round(coherencemodel.get_coherence(),3))
+    
+4. 绘制Perplexity-Coherence-Topic 折线图
+
+#用subplot()方法绘制多幅图形
+plt.figure(figsize=(16,5),dpi=200)
+x = range(2,21,1)
+
+#将画板划分为2行1列组成的区块，并获取到第一块区域
+ax1 = plt.subplot(1,2,1)
+#在第一个子区域中绘图
+plt.plot(x,perplexity)
+plt.xlabel("Num Topics")
+plt.ylabel("Perplexity score")
+plt.xticks(range(1,21,2))#设置刻度
+plt.title('困惑度')
+plt.grid(True, alpha=0.5)
+
+#选中第二个子区域，并绘图
+ax2 = plt.subplot(1,2,2)
+plt.plot(x,coherence_values)
+plt.xlabel("Num Topics")
+plt.ylabel("Coherence score")
+plt.xticks(range(1,21,2))#设置刻度
+plt.title('一致性')
+plt.grid(True, alpha=0.5)
+
+plt.savefig('./困惑度与一致性.png', dpi=300)
+
+5. 依据困惑度和一致性评价结果进行主题建模
+
+from pprint import pprint
+
+num_topics = 7#我的模型评价出来，7个主题最好
+
+lda = models.LdaModel(corpus=corpus, id2word=dictionary, random_state=1,
+                          num_topics=num_topics)  # random_state 等价于随机种子的random.seed()，使每次产生的主题一致
+ 
+topic_list = lda.print_topics(num_topics, 15)
+# print("主题的单词分布为：\n")
+# for topic in topic_list:
+#     print(topic)
+
+pprint(topic_list)
+
+参考文献：
+[1] 知乎：https://zhuanlan.zhihu.com/p/133779883
+[2] https://radimrehurek.com/gensim/models/coherencemodel.html
+[3] https://blog.csdn.net/lwhsyit/article/details/82750218
+[4] Python文本挖掘——LDA模型实现
+[4] 罗建,蔡丽君,史敏.基于专利的两阶段新兴技术识别研究——以图像识别技术为例[J].情报科学,2019,37(12):57-62.
+[5] 周厚奎. 概率主题模型的研究及其在多媒体主题发现和演化中的应用[D].浙江大学,2017.
+[6] 刘福珍. 基于文本挖掘的用户反馈服务质量及影响研究[D].武汉大学,2019.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
