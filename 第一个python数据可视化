@@ -1,0 +1,80 @@
+今天继续填坑，这是NEG发的“第一个Python+str()”第三篇，继续第一篇第一个Python爬虫、第一个Python文本分析之后，本文的数据可视化是利用WordCloud库对上次爬取的国科大要闻速递栏目的新闻进行词云呈现，这应该说是数据可视化的最基础的内容，作为入门学习十分好。
+当我们手中有一篇文档，比如书籍、小说、电影剧本，若想快速了解其主要内容是什么，则可以采用绘制 WordCloud 词云图，显示主要的关键词（高频词）这种方式，非常方便。
+根据WordCloud库的基本方法（参见参考文献），中英文的词句组合方式存在很大差异，英文分词较为容易，可直接根据空间进行分词并呈现。中文分词还涉及到分词，由于WordCloud分词效果不是很好（可以自行尝试），所以本文先用jieba分词，然后在用WordCloud 绘制词云图。
+整体代码如下：
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud, ImageColorGenerator, STOPWORDS
+import jieba
+#指定自己自定义的词典
+jieba.load_userdict("C:\\Users\\dell\\Desktop\\GuokeNews\\自建词典\国科大.txt")
+import numpy as np
+from PIL import Image
+
+#第一步，分词，WorldCloud自带分词，但是效果不是很好
+def FenCi(path):
+    #导入本地的停顿词，WorldCloud自带停顿词，这里用jieba就自定义
+    stopfile = open(r'D:\DataAnalysis\PyCharm\WorkSpce\爬虫\stop.txt', 'r',
+                    encoding='UTF-8').read()
+    stopfile = stopfile.replace(" ", "")
+    stoplist = stopfile.split('\n')
+    # 导入文本文件
+    text = open(path, encoding='utf-8').read()
+    # jieba分词
+    wordlist = []
+    for x in jieba.cut(text):
+        if len(x) >= 2 and x not in stoplist:
+            wordlist.append(x)
+    CutWords = " ".join(wordlist)
+    return CutWords
+
+#第二步，绘制词云
+def CiYun(CutWords):
+    #导入背景图
+    backgrim=np.array(Image.open(r"C:\Users\dell\Desktop\美女.jpg"))
+    #设置参数
+    wordcloud=WordCloud(
+        background_color='white',  #背景颜色
+        mask=backgrim ,   #背景图片
+        max_words = 400,  # 设置最多显示的词数
+        stopwords=STOPWORDS,  # 设置停用词
+        max_font_size=300,    # 设置字体最大值
+        font_path='C:/Users/Windows/fonts/STXINGKA.TTF',#设置字体，路径在电脑内
+        width=1600,#设置宽和高
+        height=1000,
+        random_state=30,  # 设置有多少种随机生成状态，即有多少种配色方案
+    ).generate(CutWords)
+    #展示词云
+    plt.imshow(wordcloud)
+    #是否显示x，y坐标
+    plt.axis("off")
+    plt.show()
+    #写入文件
+    wordcloud.to_file(r'C:\Users\dell\Desktop\GuokeNews\词云.png')  # 把词云保存下
+
+def main():
+    path = r"C:\Users\dell\Desktop\GuokeNews\李树深校长给2019级本科新生的信.txt"
+    CutWords = FenCi(path)
+    CiYun(CutWords)
+main()
+最后出来的结果是这样的,用了张美美的底图：
+如果感兴趣还可以参照WordCloud的官方文档对相关参数进行调整，可以展现多样的效果。
+参考文献：
+1. WordCloud库基本介绍和使用方法.https://www.cnblogs.com/randysun/p/11215095.html
+2. WordCloud · PyPI.https://pypi.org/project/wordcloud/
+3. wordcloud使用教程: https://blog.csdn.net/skylibiao/article/details/89702746
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
