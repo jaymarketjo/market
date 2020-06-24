@@ -1,0 +1,152 @@
+第一个python爬虫—爬取国科大的“要闻速递”
+写爬虫是一项系统工程，除了基本你的python语法之外，还要懂一点儿Html的语法，当然，如果懂程序设计，就能将你的工作实现得更好。开始写爬虫通常应该在具备了Python基础知识以后才可以开始，对于0基础的人来说，不要相信“直接用别人的代码”，因为可能完全看不懂，满脸莫名其妙。
+Python基础知识：首先就是需要了解Python基本语法，然后对爬虫而言，Python有很多应用可以获取网页内容，包括urllib、urllib2、urllib3、wget、scrapy、requests等。对爬回来的内容可以用re（正则表达式）、beautifulsoup4等函数库来处理。可以参考市面上大多数的Python语言程序设计的教材，比如我用的就是嵩天等著的《Python语言程序设计基础》，其配套视频是中国大学慕课上播放，这是我看过的最通俗易懂的python基础教学视频。
+爬虫的基本原理：（1）通过网络链接获取网页内容；（2）对获得的网页内容进行处理已提取信息；（3）将获取的数据以某种格式保存在某地（路径）。具体可以参考崔庆才著《Python3网络爬虫开发实战》，这本书有一定难度，是面向开发的读者写的，0基础的不建议看，可以在了解了Python基本语法和基本生态以后再看。
+在认识爬虫原理的基础上，要具体完成一个简单的爬虫项目，利用requests库、beautifulsoup4库和csv库分别进行网页获取、信息提取、数据保存。那么在写代码以前，首先需要熟悉这三个库。
+这里以中国科学院大学新闻网的“要闻速度”栏目的新闻爬取作为案例：
+1. 首先import库
+import requestsfrom bs4 import  BeautifulSoupimport csv
+2. 其次设计程序整体框架
+（1）生成文件保存链接
+def UrlFile(path):
+（2）获取链接
+def getHtmlText(url1):
+（3）保存链接
+def UrlList(soup1,path):
+（4）根据保存的链接获取每个链接的网页内容
+def GetNews(path):
+（5）提取每个链接的信息并保存新闻内容
+def NewsFiles(path,soup2):
+（6）主函数，配置并调用每个函数
+3. 然后对每个函数（模块）进行具体问题的解决
+整体的代码如下：
+import requests
+from bs4 import  BeautifulSoup
+import csv
+
+def UrlFile(path):
+    with open(path + "guokeyaowen.csv", "a", encoding='UTF-8', newline='') as fo:
+        writer = csv.writer(fo, delimiter=",")
+        header = ['Time', 'Title', 'Html']
+        writer.writerow(header)
+
+def getHtmlText(url1):
+    try:
+        r=requests.get(url1)
+        r.raise_for_status()
+        r.encoding='utf-8'
+        return  r.text
+    except:
+        return ""
+
+def UrlList(soup1,path):
+    csvrow1 = []
+    csvrow2 = []
+    csvrow3 = []
+    with open(path + "guokeyaowen.csv", "a", encoding='UTF-8',newline='') as fo:
+        writer = csv.writer(fo, delimiter=",")
+        for item in soup1.select('.b-list'):
+            data = item.find_all('li')
+            # print(data)
+            alllist=[]
+            for li in data:
+                for item in li.find_all('span'):
+                    time= item.get_text()
+                    t1=time.replace('\t','')
+                    t=t1.replace('\n','')
+                    # print(t)
+                    csvrow1.append(t)
+                    # print(csvrow1)
+                for item in li.find_all('a'):
+                    h = item.get("href")
+                    html="http://news.ucas.ac.cn"+h
+                    csvrow3.append(html)
+                    title=title=item.get_text()
+                    csvrow2.append(title)
+        writer.writerows(zip(csvrow1, csvrow2, csvrow3))
+
+def GetNews(path):
+    with open(path + "guokeyaowen.csv", "r", encoding='UTF-8') as fo:
+        reader=csv.reader(fo)
+        column2=[row[2]for row in reader]
+        # print(column2)
+        l=len(column2)
+        # print(l)
+        url2=[]
+        for i in range(l):
+            if i==0:
+                pass
+            else:
+                url2.append(column2[i])
+
+        for item in url2:
+            try:
+                rnews = requests.get(item)
+                rnews.raise_for_status()
+                rnews.encoding = 'utf-8'
+                return rnews.text
+                print(rnews)
+            except:
+                return ""
+
+def NewsFiles(path,soup2):
+    with open(path + "guokeyaowen.csv", "r", encoding='UTF-8') as fo:
+        reader = csv.reader(fo)
+        column1 = [row[1] for row in reader]
+        # print(column1)
+        l = len(column1)
+        # print(l)
+        names= []
+        for i in range(l):
+            if i == 0:
+                pass
+            else:
+                names.append(column1[i])
+                for item in names:
+                    # print(item)
+                    full_path = path + str(item) + '.txt'  # 也可以创建一个.doc的word文档
+                    file = open(full_path, 'w', encoding='UTF-8')
+                    for nn in soup2.select('.b-abody'):
+                        data = nn.find_all('span')
+                        print(data)
+                        for span in data:
+                            news = span.get_text()
+                            print(news)
+                            file.write(news)
+                    file.close()
+
+def main(num):
+    path = "C:\\Users\\dell\\Desktop\\GuokeNews\\"
+    UrlFile(path)
+    for i in range(num):
+        a=10*(i-1)
+        url1 = "http://news.ucas.ac.cn/index.php/ywsd?start="+str(a)
+        # print(url1)
+        html=getHtmlText(url1)
+        soup1 = BeautifulSoup(html, 'html.parser')
+        UrlList(soup1,path)
+    html2=GetNews(path)
+    soup2 = BeautifulSoup(html2, 'html.parser')
+    NewsFiles(path,soup2)
+
+main(20)
+通过以上代码可以爬取中国科学院大学新闻网上“要闻速递”的前20页新闻，保存为txt文档。
+在此基础还可以进一通过简单的文本分析获取一些信息，比如看看国科大2018的关键词是什么，都发生了什么，可以作词云等展示。这将作为下一章内容。
+未完待续……
+ 
+ 参考文献：
+嵩天, 黄天羽, 礼欣. Python语言程序设计基础（第2版）[M].高等教育出版社，2017.
+崔庆才. Python3网络爬虫开发实战[M]. 人民邮电出版社，2018.
+
+
+
+
+
+
+
+
+
+
+
+
+
