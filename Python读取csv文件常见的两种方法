@@ -1,0 +1,62 @@
+#昨天粘贴代码出现错误，这里重新更正，欢迎大家批评指正。
+在做数据分析的过程中，十分重要的环节就是数据的读取，数据读取可以使用多种方法存储到不同的数据容器里面，python中常见的数据容器包括：csv、excel、json和数据库。这里首先来梳理一下，csv文件的基本知识以及python中csv文件常见的两种方法。
+
+一、数据存取之csv
+（一）什么是csv
+CSV是一种通用的、相对简单的文件格式，被用户、商业和科学广泛应用。最广泛的应用是在程序之间转移表格数据，而这些程序本身是在不兼容的格式上进行操作的（往往是私有的和/或无规范的格式）。因为大量程序都支持某种CSV变体，至少是作为一种可选择的输入/输出格式。
+例如，一个用户可能需要交换信息，从一个以私有格式存储数据的数据库程序，到一个数据格式完全不同的电子表格。最可能的情况是，该数据库程序可以导出数据为“CSV”，然后被导出的CSV文件可以被电子表格程序导入。
+“CSV”并不是一种单一的、定义明确的格式（尽管RFC 4180有一个被通常使用的定义）。因此在实践中，术语“CSV”泛指具有以下特征的任何文件：
+1. 纯文本，使用某个字符集，比如ASCII、Unicode、EBCDIC或GB2312；
+2. 由记录组成（典型的是每行一条记录）；
+3. 每条记录被分隔符分隔为字段（典型分隔符有逗号、分号或制表符；有时分隔符可以包括可选的空格），正确解析 csv 文件需要我们知道正在使用的分隔符；
+4. 每条记录都有同样的字段序列。
+其结构通常是这样的：
+column 1 name,column 2 name, column 3 name
+first row data 1,first row data 2,first row data 3
+second row data 1,second row data 2,second row data 3
+...
+
+（二）读写csv文件的读写
+Python中读写csv主要有两种：
+1. 使用python I/O写入和读取CSV文件
+read 读取整个文件
+readline 读取下一行
+readlines 读取整个文件到一个迭代器以供我们遍历（读取到一个list中，以供使用，比较方便）
+#读取csv
+path = 'data/city.csv'
+fl = open(path,'a')
+A = fl.write()
+fl.close()
+#写入csv
+A = ['a,1,11','b,2,22',c,333']
+path = 'data/city.csv'
+fl = open(path,'a')
+fl.write(A)
+fl.close()
+#使用with语句，后面可以不进行文件关闭操作
+path = 'data/city.csv'
+with open(path,'r') as fl:
+    i = fl.readlines()
+    print(i)
+2. 使用Pandas读取CSV文件
+import pandas as pd
+#读取csv
+path = 'data/city.csv'
+fl = pd.read_csv(path)
+# 读取指定列索引字段的数据
+fl = pd.read_csv(path,usecols=['open', 'close'])
+#写入csv
+A = ['a,1,11','b,2,22',c,333']
+fl = pd.DataFrame(A)
+fl.to_csv(path)
+#使用to_csv的时候, 我们可以给他传入几个参数:
+fl.to_csv(path, header=True, index=False)
+注：to_csv这个方法中可以传递一些参数:
+DataFrame.to_csv(path_or_buf=None, sep=', ’, columns=None, header=True, index=True, index_label=None, mode='w', encoding=None)
+path_or_buf :文件保存的路径;
+sep :默认是以 , 进行分割 , 也可以自己制定;
+columns : 保存索引列和指定列;
+index:是否写进行索引 0或者1;
+header :boolean or list of string, default True,是否写进列索引值 0或者 1;
+na_rep=NaN: 缺失值保存为Na 如果不写 默认为空;
+float_format='%.2f' :保留两位小数。
