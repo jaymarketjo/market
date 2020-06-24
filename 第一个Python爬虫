@@ -116,7 +116,7 @@ def NewsFiles(path,soup2):
                     file.close()
 
 def main(num):
-    path = "C:\\Users\\dell\\Desktop\\GuokeNews\\"
+    path = "C:\\Users\\dell\\Desktop\\GuokeNews\\" #保存爬取文档的路径
     UrlFile(path)
     for i in range(num):
         a=10*(i-1)
