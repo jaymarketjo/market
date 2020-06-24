@@ -1,0 +1,162 @@
+1、简介
+
+在机器学习领域，LDA是两个常用模型的简称：Linear Discriminant Analysis和Latent Dirichlet Allocation。本文的LDA是指Latent Dirichlet Allocation，它在主题模型中占有非常重要的地位，常用来文本分类。
+
+LDA由Blei, David M.、Ng, Andrew Y.、Jordan于2003年提出，用来推测文档的主题分布。它可以将文档集中每篇文档的主题以概率分布的形式给出，从而通过分析一些文档抽取出它们的主题分布后，便可以根据主题分布进行主题聚类或文本分类。
+
+2、原理
+
+LDA模型它是一种典型的词袋模型，即一篇文档是由一组词构成，词与词之间没有先后顺序的关系。此外，一篇文档可以包含多个主题，文档中每一个词都由其中的一个主题生成。
+
+人类生成文档是基于概率选取主题及其对应的词汇的方式，即一篇文章的每个词都是通过“以一定概率选择了某个主题，并从这个主题中以一定概率选择某个词语”这样一个过程得到。
+
+那么LDA要做的就是通过文档反推主题。文档到主题服从多项式分布，主题到词服从多项式分布。每一篇文档代表了一些主题所构成的一个概率分布，而每一个主题又代表了很多单词所构成的一个概率分布。
+
+用LDA来进行主题建模就是要以无指导学习的方法从文本中发现隐含的语义维度-即“Topic”或者“Concept”。隐性语义分析的实质是要利用文本中词项(term)的共现特征来发现文本的Topic结构，这种方法不需要任何关于文本的背景知识。
+
+3、实现过程
+
+这一过程可以通过Python轻松实现。需要的Python 包有：
+
+•pandas，pandas 是基于NumPy 的一种工具，该工具是为了解决数据分析任务而创建的。在 Windows 下使用 pip 安装：pip install pandas.•gensim，包含我们要用到的 LDA 模型的一个主题模型包。在 Windows 下使用 pip 安装：pip install gensim.•jieba，是一款优秀的 Python 第三方中文分词库。在 Windows 下使用 pip 安装：pip install jieba.
+3.1 导入包
+
+from gensim import corpora, models
+import jieba.posseg as jp, jieba
+import pandas as pd
+
+3.2 分词
+
+#导入本地词库
+jieba.load_userdict(r"C:\Users\Administrator\Desktop\李子柒微博词云\李子柒微博分词补充词库.txt")
+
+#导入本地的停顿词，WorldCloud自带停顿词，这里用jieba就自定义
+stopfile = open(r'C:\Users\Administrator\Desktop\李子柒微博词云\李子柒微博分词停用词.txt', 'r',
+                    encoding='UTF-8').read()
+#print(stopfile)
+stopfile = stopfile.replace(" ", "")
+#print(stopfile)
+stopwords = stopfile.split('\n')
+#print(stopwords)
+
+df = pd.read_csv(r"C:\Users\Administrator\Desktop\李子柒微博词云\李子柒微博【原创】.csv",encoding='gbk')
+strs = df["微博正文"]
+words_ls=[]
+for str in strs:
+    seg_list = jieba.cut(str+'。', cut_all=False) # 采用全模式
+for i in seg_list:
+if len(i)>1and i notin stopwords:
+            words_ls.append([i])# corpora构造词典不能用单纯的字符串
+
+print(words_ls)
+
+3.3 词典化
+
+# 构造词典
+dictionary = corpora.Dictionary(words_ls)
+
+3.4 将文档表示成词袋向量
+
+# 基于词典，使【词】→【稀疏向量】，并将向量放入列表，形成【稀疏向量集】
+corpus = [dictionary.doc2bow(words) for words in words_ls]
+
+3.5 LDA建模
+
+# lda模型，num_topics设置主题的个数
+lda = models.ldamodel.LdaModel(corpus=corpus, id2word=dictionary, num_topics=10)
+
+打印主题
+
+# 打印所有主题，每个主题显示5个词
+for topic in lda.print_topics(num_words=5):
+print(topic)
+print(lda.inference(corpus))
+
+完整代码
+
+from gensim import corpora, models
+import jieba.posseg as jp, jieba
+import pandas as pd
+
+#导入本地词库
+jieba.load_userdict(r"C:\Users\Administrator\Desktop\李子柒微博词云\李子柒微博分词补充词库.txt")
+
+#导入本地的停顿词，WorldCloud自带停顿词，这里用jieba就自定义
+stopfile = open(r'C:\Users\Administrator\Desktop\李子柒微博词云\李子柒微博分词停用词.txt', 'r',
+                    encoding='UTF-8').read()
+#print(stopfile)
+stopfile = stopfile.replace(" ", "")
+#print(stopfile)
+stopwords = stopfile.split('\n')
+#print(stopwords)
+
+df = pd.read_csv(r"C:\Users\Administrator\Desktop\李子柒微博词云\李子柒微博【原创】.csv",encoding='gbk')
+strs = df["微博正文"]
+words_ls=[]
+for str in strs:
+    seg_list = jieba.cut(str+'。', cut_all=False) # 采用全模式
+for i in seg_list:
+if len(i)>1and i notin stopwords:
+            words_ls.append([i])# corpora构造词典不能用单纯的字符串
+
+print(words_ls)
+
+# 构造词典
+dictionary = corpora.Dictionary(words_ls)
+
+# 基于词典，使【词】→【稀疏向量】，并将向量放入列表，形成【稀疏向量集】
+corpus = [dictionary.doc2bow(words) for words in words_ls]
+
+# lda模型，num_topics设置主题的个数
+lda = models.ldamodel.LdaModel(corpus=corpus, id2word=dictionary, num_topics=10)
+
+# 打印所有主题，每个主题显示5个词
+for topic in lda.print_topics(num_words=5):
+print(topic)
+print(lda.inference(corpus))
+
+参考资料：
+
+LDA主题模型原理解析与python实现.https://zhuanlan.zhihu.com/p/34712576 
+通俗理解LDA主题模型.https://blog.csdn.net/v_july_v/article/details/41209515
+ jieba的简单使用.https://blog.csdn.net/linzch3/article/details/71253541 
+Python+gensim【中文LDA】简洁模型.https://blog.csdn.net/Yellow_python/article/details/83097994
+用 Python 实现 LDA.https://blog.csdn.net/github_36299736/article/details/54966460 
+【项目实战】针对Twitter舆情进行LDA建模.https://aoii103.github.io/post/2020_04_07_%E5%AD%A6%E7%82%B9nlp-twitter%E8%88%86%E6%83%85lda%E5%BB%BA%E6%A8%A1/ 
+主题模型（LDA）(一)--通俗理解与简单应用.https://blog.csdn.net/qq_39422642/article/details/78730662
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
