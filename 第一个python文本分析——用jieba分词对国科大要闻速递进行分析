@@ -1,0 +1,100 @@
+上一次写第一个python爬虫，在文末给自己挖了一个坑，这次是来填坑的，填坑再挖坑，这里用jieba分词来计算词频并保存文件，下一篇将进一步分享用词云来展示。
+这算是用python写的第二个程序，大体上还是参考了一些别人的代码，进一步对我要解决的问题做了很多修改。一个体会就是学习python，复用别人的程序时必须的调试过程，是一个学习很快的过程。
+这次的程序主要要解决的问题是对爬取下来的180个txt文档中的新闻进行分词，计算词频，看看国科大2019年至今出现了哪些关键词，以此看国科大要闻速递的新闻报道内容倾向和关注热点。
+根据问题搭建代码的框架：
+首先需要获取文档列表，这里主要用到os库，相关教程可以参考：https://www.runoob.com/python/os-file-methods.html
+然后获取每一个文档中的文本，并进行分词，这里主要用到jieba和collections模块的Counter类，相关教程可以参考：（1）jieba：https://github.com/fxsjy/jieba；（2）counter：http://www.pythoner.com/205.html
+然后再将词频统计结果写入csv文件，主要用到csv库，相关知识可以参考：https://docs.python.org/3/library/csv.html
+最后用主函数调用以上函数
+以下是完整代码：
+# 根据爬取的国科大新闻进行词频分析
+# 2019年11月27日于中关村
+
+import jieba#导入jieba分词包
+jieba.load_userdict("C:\\Users\\dell\\Desktop\\GuokeNews\\自建词典\国科大.txt")#加入自建词典
+import csv
+from collections import Counter
+import os
+
+mainpath = 'C:\\Users\\dell\\Desktop\\GuokeNews\\'
+os.chdir(mainpath)#将当前工作目录更改为给定路径
+
+#第一步获取文件列表
+def getFileList(path):
+    path = str('C:\\Users\\dell\\Desktop\\GuokeNews\\')
+    a = os.listdir(path)#返回path指定的文件夹包含的文件或文件夹的名字的列表
+    filelist = [x for x in a if os.path.isfile(path + x)]#判断路径是否为文件，若是则加入列表
+    return filelist
+
+#第二步 获取文件中的文本，并进行分词
+def get_data(path):
+    filelist = getFileList(path)
+    # 获取停用词列表
+    stopfile=open(r'D:\DataAnalysis\PyCharm\WorkSpce\爬虫\stop.txt', 'r',
+                  encoding='UTF-8').read()
+    stopfile = stopfile.replace(" ","")
+    stoplist = stopfile.split('\n')
+    wordlist = []
+    wordlist1 = []
+    for file in filelist:
+        filename, extension = os.path.splitext(file)#分割路径，返回路径名和文件扩展名的元组
+        file=open(file,'r', encoding='UTF-8').read()
+        words = [x for x in jieba.cut(file) if len(x) >= 2 and x not in stoplist]#进行分词
+        wordlist.append(words)
+    #将列表中的每一个元素提取出来加入列表1
+    for each in wordlist:
+        wordlist1 += each
+    #对单词呈现频数进行统计
+    b = Counter(wordlist1)
+    return b
+
+#第三步将词频统计结果写入csv文件
+def WriteCsv(b):
+    #获取键值对的值和键
+    freq = b.values()
+    word = b.keys()
+    with open('C:\\Users\\dell\\Desktop\\GuokeNews\\国科大要闻关键词.csv', "a", encoding='UTF-8', newline='') as fo:
+        writer = csv.writer(fo, delimiter=",")
+        header = ['word', 'freq']
+        writer.writerow(header)#表头
+        writer.writerows(zip(word,freq))#写入数据
+
+#主函数
+def main():
+    path = 'C:\\Users\\dell\\Desktop\\GuokeNews\\'
+    getFileList(path)
+    b=get_data(path)
+    WriteCsv(b)
+main()
+实现的结果是这样的
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
