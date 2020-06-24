@@ -1,0 +1,94 @@
+Pandas官网：https://pandas.pydata.org/
+Pandas中文网：https://www.pypandas.cn/
+城市作为区域的热点区域，因为是居民点，也是大多数POI生成的位置所在，同时也是区域经济中最重要的载体和形态，因此对城市的数据挖掘与分析十分重要，在Python环境中，学习使用pands是进行数据分析与建模的基础（nunpy是基础中的基础）。
+
+1. Pands简介
+
+Pandas是一个强大的分析结构化数据的工具集；它的使用基础是Numpy（提供高性能的矩阵运算）；用于数据挖掘和数据分析，同时也提供数据清洗功能。
+
+2. Pandas应用
+
+Pandas帮助弥补了Numpy在数据分析与建模上的空白，是Python中进行数据分析与建模的基础库，在线性和面板回归建模上效果不佳，如果要学习这些还可以使用statsmodels 和scikit-learn库。
+
+Pandas库提供了专门从财经网站获取金融数据的API接口，可以使用pandas-datareader包，此外常用的开源数据库，tushare、akshare、baostock、dtshare也都是基于pandas的格式。
+
+3. numpy与Pandas的区别
+
+Numpy: 基础的数学计算模块，以矩阵为主，纯数学。
+
+Pandas: 提供了一套名为DataFrame的数据结构，适合统计分析中的表结构。
+
+NumPy：N维数组容器
+
+array([[0,1,2,3,4],
+[5,6,7,8,9],
+[10,11,12,13,14]])
+Pandas是python的一个数据分析库，它提供了大量能使我们快速便捷地处理数据的函数和方法。它可以以各种格式（包括数据库）输入输出数据、执行join以及其他SQL类似的功能来重塑数据、熟练地处理缺失值、支持时间序列、拥有基本绘图功能和统计功能，等等还有很多。
+4. pandas数据结构  
+Series --1D
+DataFrame --2D
+Panel --3D
+
+pandas.Series(data=None,index=None,dtype=None,name=None,copy=False,fastpath=False)[source]
+
+(1)series-1D
+
+Series对象 是一个带索引数据构成的 一维数组。可以用一个一维数组创建Series对象。
+
+数组中的数据可以是任意的类型
+
+(integers, strings, floating point numbers, Python objects, etc.).
+数组中的数据必须是同一数据结构
+创建Series
+import numpy as np
+import pandas as pd
+data=np.random.randn(10)#生成正态分布的随机数
+s=pd.Series(data)
+type(s)
+(2)DataFrame --2D
+
+DataFrame是一种表格型数据结构，它含有一组有序的列，每列可以是不同的值。DataFrame既有行索引，也有列索引，它可以看作是由Series组成的字典，不过这些Series公用一个索引。DataFrame的创建有多种方式，不过最重要的还是根据dict进行创建，以及读取csv或者txt文件来创建。
+
+根据字典创建
+data = {'state':['Ohio','Ohio','Ohio','Nevada','Nevada'],    
+
+'year':[2000,2001,2002,2001,2002],
+    
+'pop':[1.5,1.7,3.6,2.4,2.9]
+}
+
+frame =pd.DataFrame(data)
+
+frame
+
+读取文件创建
+
+读取文件生成DataFrame最常用的是readcsv,readtable方法
+
+参数	描述
+header	默认第一行为columns，如果指定header=None，则表明没有索引行，第一行就是数据
+index_col	默认作为索引的为第一列，可以设为index_col为-1，表明没有索引列
+nrows	表明读取的行数
+sep或delimiter	分隔符，readcsv默认是逗号，而readtable默认是制表符\t
+encoding	编码格式
+
+在日常的数据分析中，大多数场景需要通过Pandas存储和读取数据，比如我们可以通过读取mysql或者mongoDB来生成，也可以读取json文件等等。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
