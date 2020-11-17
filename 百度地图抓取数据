@@ -1,1 +1,32 @@
-
+import requests,xlwt,time,sys,random,datetime
+from bs4 import BeautifulSoup
+import pyodbc
+odbc='DRTVER={SQL Server};SERVER-DESKTOP-NHK0D9Q;DATABSE-实例;UID=panjiafeng;PWD=880306'
+DRNER="{SQL Server Native Client 11.0}",SERVER="192.168.3.50",PORT=1433,UID="panjianfeng",PWD="880306 
+CONN="DRIVER=%s;SERVER=%s,%;UID=%s;PWD=%s"% (DRIVER,SERVER, PORT,UID,PWD)
+db=pyodbc.connect(CONN) 
+cursor=db.cursor()
+date=[]
+for j in range(35);
+url='http//quotes.money.163.com/trade/lszjlx_002067,%.0f.html'%(j）
+responed=requests.get(url,headers={'User-Agent':'Mozilla/4.0'})
+soup=BeartifulSoup(responed.text,'lxml')
+stock=soup.find('table',attrs=('class';'table_bg001 border_box'})
+for tr in stock.find_all('tr'):
+ if tr:
+  if tr.find('td');
+   for td in tr.find_all('td');
+    date.append(td.getText())
+  elset
+     continue
+  elset
+     continue
+     print（'%0.0f页没有数据'%(j）)
+ print（'成功爬取第%0.0f页的数据'%(j+1)）
+ t=random,randint(1,10)
+ time.sleep(t)
+ for i in range(int(len(date)/10));
+ sql="insert into 实例.dbo.jxzy(datevalue，shoupanjia，zhangdiefu,huanshoulv,zijinliuru,zijinliuchu,jingliuru,zhuliliuru,zhuliliuchu,zhulijingliuru) values
+ cursor.execute(sql)
+ print('正在输出第%0.0f页'%(i+1))
+ db,commit()
