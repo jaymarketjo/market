@@ -5,7 +5,7 @@
 
 import pandas as pd
 
-df = pd.DataFrame({'ID':[0,1,2],'Name':['Mark','Tomi','Jack'],'Type':['male','female','male']})
+df = pd.DataFrame({'ID':[0,1,2],'Name':['Mark','Tomi','Jack'],'Type':['male','female','male'],'Title':['Staff','Staff','Staff'],'FirstName':['Liam','Cary','Ashton']})
 
 # 此处设置数据表的索引，如未设置索引会自动在最前方添加一列作为索引
 df = df.set_index('ID') # 会生成新的 DataFrame
