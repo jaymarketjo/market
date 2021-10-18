@@ -1,3 +1,4 @@
 PyCharm
 需要安装requests库、bs4库、lxml库
 Python绘制桑基图 需要安装pyecharts库
+需要安装代码滚动预览插件CodeGlance、JSON美化插件Json Parser、快捷键管理大师插件Key Promoter X
